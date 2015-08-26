@@ -14,6 +14,15 @@ parser.add_argument('-t', '--tree_fp',
     type=str,
     help='newick-format tree file to color')
 
+parser.add_argument('-o', '--output_fp', 
+    type=str,
+    default=None,
+    help='output image filepath (must have .svg, .pdf, or .png extension')
+
+parser.add_argument('-s', '--supress_display', 
+    action='store_true',
+    help='supress display of tree in treeview application')
+
 parser.add_argument('--hue_start',
     type=float,
     default=0,
@@ -159,7 +168,7 @@ def hls_to_rgb_hex(h,l,s):
     return hex_rgb
 
 
-def render_tree(sk_tree,tip_hues,tip_lums,saturation=0.9):
+def render_tree(sk_tree, tip_hues, tip_lums, saturation=0.9, output_fp=None, supress_display=False):
     ete_tree = Tree(str(sk_tree))
     tree_tips = [x.name for x in sk_tree.tips()]
 
@@ -174,11 +183,22 @@ def render_tree(sk_tree,tip_hues,tip_lums,saturation=0.9):
             hex_color = hls_to_rgb_hex(tip_hues[n.name], tip_lums[n.name], saturation)
             n.add_features(tip_color=hex_color)
 
+    style = NodeStyle()
+    style["size"] = 0
+    for l in ete_tree.traverse():
+        l.set_style(style)
+
     ts = TreeStyle()
     ts.layout_fn = layout
     ts.show_leaf_name = False
 
-    ete_tree.show(tree_style = ts)
+    if output_fp:
+        ete_tree.render(output_fp, tree_style = ts)
+
+    if not supress_display:
+        ete_tree.show(tree_style = ts)
+
+    return
 
 
 def layout(node):
@@ -192,6 +212,7 @@ def main():
     args = parser.parse_args()
 
     tree_fp = args.tree_fp
+    output_fp = args.output_fp
     hue_start = args.hue_start
     hue_end = args.hue_end
     saturation = args.saturation
@@ -200,6 +221,7 @@ def main():
     lum_max = args.lum_max
     lum_min = args.lum_min
     lum_sep = args.lum_sep
+    supress_display = args.supress_display
 
     sk_tree = TreeNode.read(tree_fp)
 
@@ -213,7 +235,7 @@ def main():
                                      lum_min=lum_min,
                                      lum_sep=lum_sep)
 
-    render_tree(sk_tree, tip_hues, tip_lums, saturation=saturation)
+    render_tree(sk_tree, tip_hues, tip_lums, saturation=saturation, output_fp=output_fp, supress_display=supress_display)
 
 
 if __name__ == "__main__":
