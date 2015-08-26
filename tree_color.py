@@ -2,10 +2,59 @@
 
 import numpy as np
 import math
+import argparse
 from colorsys import hls_to_rgb
 from StringIO import StringIO
 from skbio import TreeNode
 from ete2 import Tree, faces, AttrFace, TreeStyle, NodeStyle
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('-t', '--tree_fp', 
+    type=str,
+    help='newick-format tree file to color')
+
+parser.add_argument('--hue_start',
+    type=float,
+    default=0,
+    help='Starting hue, between 0 and 1. default=%(default)s')
+
+parser.add_argument('--hue_end',
+    type=float,
+    default=.8,
+    help='Ending hue, between 0 and 1. default=%(default)s')
+
+parser.add_argument('--saturation',
+    type=float,
+    default=0.9,
+    help='Saturation, between 0 and 1. default=%(default)s')
+
+parser.add_argument('--depth_thresh',
+    type=float,
+    default=.3,
+    help='Clade depth threshold (as a proportion of total tree depth)' \
+         ' for iterating lightness values. default=%(default)s')
+
+parser.add_argument('--lum_default',
+    type=float,
+    default=.7,
+    help='Default lighness value for tip labels. default=%(default)s')
+
+parser.add_argument('--lum_max',
+    type=float,
+    default=.9,
+    help='Maximum lightness value for tip labels. default=%(default)s')
+
+parser.add_argument('--lum_min',
+    type=float,
+    default=.5,
+    help='Minimum lightness value for tip labels. default=%(default)s')
+
+parser.add_argument('--lum_sep',
+    type=float,
+    default=.15,
+    help='standard spacing of lightness values for tip labels. default=%(default)s')
+
 
 def get_tip_hues(tree, hue_start=0, hue_end=.8):
     """Picks hues for tips of tree"""
@@ -22,6 +71,7 @@ def get_tip_hues(tree, hue_start=0, hue_end=.8):
     tip_hues = np.insert(spacing_hues, 0, hue_start)
 
     return(dict(zip(x.ids, tip_hues)))
+
 
 def get_tip_lums_by_hue(tip_hues, lum_start=.9, lum_end=.3, hue_per_lum=7):
     """Attempt to pick luminance per tip to maximize separation of similar hues"""
@@ -109,7 +159,7 @@ def hls_to_rgb_hex(h,l,s):
     return hex_rgb
 
 
-def render_tree(tree,tip_hues,tip_lums,saturation=0.9):
+def render_tree(sk_tree,tip_hues,tip_lums,saturation=0.9):
     ete_tree = Tree(str(sk_tree))
     tree_tips = [x.name for x in sk_tree.tips()]
 
@@ -130,21 +180,43 @@ def render_tree(tree,tip_hues,tip_lums,saturation=0.9):
 
     ete_tree.show(tree_style = ts)
 
+
 def layout(node):
     if node.is_leaf():
         # Add node name to laef nodes
         N = AttrFace("name", fsize=14, fgcolor=node.tip_color)
         faces.add_face_to_node(N, node, 0)
 
-ete_tree = Tree()
-ete_tree.populate(17,random_branches=True)
 
-sk_tree = TreeNode.read(StringIO(unicode(ete_tree.write())))
+def main():
+    args = parser.parse_args()
 
-tip_hues = get_tip_hues(sk_tree, hue_start=0, hue_end=.8)
+    tree_fp = args.tree_fp
+    hue_start = args.hue_start
+    hue_end = args.hue_end
+    saturation = args.saturation
+    depth_thresh = args.depth_thresh
+    lum_default = args.lum_default
+    lum_max = args.lum_max
+    lum_min = args.lum_min
+    lum_sep = args.lum_sep
 
-#tip_lums = get_tip_lums_by_hue(tip_hues, lum_start=.8, lum_end=.4, hue_per_lum=7)
-tip_lums = get_tip_lums_by_clade(sk_tree, depth_thresh=.4)
+    sk_tree = TreeNode.read(tree_fp)
 
+    tip_hues = get_tip_hues(sk_tree, hue_start=hue_start, hue_end=hue_end)
+
+    #tip_lums = get_tip_lums_by_hue(tip_hues, lum_start=.8, lum_end=.4, hue_per_lum=7)
+    tip_lums = get_tip_lums_by_clade(sk_tree,
+                                     depth_thresh=depth_thresh,
+                                     lum_default=lum_default,
+                                     lum_max=lum_max,
+                                     lum_min=lum_min,
+                                     lum_sep=lum_sep)
+
+    render_tree(sk_tree, tip_hues, tip_lums, saturation=saturation)
+
+
+if __name__ == "__main__":
+    main()
 
 
