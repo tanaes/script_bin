@@ -187,7 +187,7 @@ def main():
 
     host_colors = get_host_colors_from_tree(host_tree_fp)
 
-     try:
+    try:
         os.makedirs(output_dir)
     except OSError:
         if not force:
