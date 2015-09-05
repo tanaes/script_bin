@@ -43,6 +43,9 @@ parser.add_argument('-f', '--output_format',
     default='pdf',
     help='format for tree image output. default=%(default)s')
 
+parser.add_argument('--force', 
+    action='store_true',
+    help='force overwrite of output directory')
 # read symbiont trees output
 
 def read_cosp_nodes_table(table_fp):
@@ -178,10 +181,20 @@ def main():
     pies = args.pies
     labels = args.labels
     output_format = args.output_format
+    force = args.force
 
     results_table = read_cosp_nodes_table(results_table_fp)
 
     host_colors = get_host_colors_from_tree(host_tree_fp)
+
+     try:
+        os.makedirs(output_dir)
+    except OSError:
+        if not force:
+            # Since the analysis can take quite a while, I put this check
+            # in to help users avoid overwriting previous output.
+            raise OSError("Output directory already exists. Please choose "
+                "a different directory, or force overwrite with -f.")
 
     if collapse_field:
         cotu_biom_filename = 'otu_table_%s.biom' % collapse_field
