@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from skbio import TreeNode
 from ete2 import Tree, faces, AttrFace, TreeStyle, NodeStyle, TextFace
-from biom import parse_table
+from biom import parse_table, load_table
 
 
 parser = argparse.ArgumentParser()
@@ -38,6 +38,10 @@ parser.add_argument('-o', '--output_dir',
     type=str,
     help='path to output directory for writing tree images')
 
+parser.add_argument('--potu_table_fp', 
+    type=str,
+    help='path to pOTU table for adding taxonomy information to cOTU trees')
+
 parser.add_argument('-f', '--output_format', 
     choices=['pdf', 'png', 'svg'],
     default='pdf',
@@ -65,7 +69,7 @@ def read_mapping_file(map_fp):
 
 
 # read in host tree + calculate colors
-
+    
 def get_host_colors_from_tree(host_tree_fp,
                               hue_start=0,
                               hue_end=.8,
@@ -144,6 +148,42 @@ def add_host_pies(cotu_tree, cotu_table, host_colors, count = True, max_pie=100)
 
     return
 
+def add_taxonomy_label(cotu_tree, potu_table):
+
+    ts = TreeStyle()
+
+    for row in range(len(labels_list)):
+        for col in range(len(labels_list[row])):
+            ts.legend.add_face(TextFace(labels_list[row][col], fsize=20), column=col)
+
+
+def print_colored_host_tree(host_tree_fp, host_colors, output_fp):
+    tree = Tree(host_tree_fp)
+
+    for host in host_colors:
+        if tree.get_leaves_by_name(host) == []:
+            tip = "'%s'" % host
+        else:
+            tip = host
+
+        node = tree.get_leaves_by_name(tip)[0]
+
+        node.add_face(AttrFace("name", fsize=14, fgcolor=host_colors[host]), 0)
+    
+    # remove stupid blue circles on nodes
+    style = NodeStyle()
+    style["size"] = 0
+    for l in tree.traverse():
+        l.set_style(style)
+
+    # get rid of default rendered leaf labels
+    ts = TreeStyle()
+    ts.show_leaf_name = False
+    
+    tree.render(output_fp, tree_style = ts)
+
+    return
+        
 
 def remove_newick_node_labels(tree_string):
     import re
@@ -151,8 +191,7 @@ def remove_newick_node_labels(tree_string):
     return(re.sub(r'\)[\w.]+?\:',r'):', tree_string))
 
 
-def render_cotu_tree(cotu_tree, output_fp):
-    ts = TreeStyle()
+def render_cotu_tree(cotu_tree, output_fp, ts=TreeStyle()):
     ts.show_leaf_name = True
     # ts.scale =  300 # 120 pixels per branch length unit
     # ts.mode = "c"
@@ -165,7 +204,7 @@ def render_cotu_tree(cotu_tree, output_fp):
 
     print 'rendering tree'
     
-    cotu_tree.render(output_fp)
+    cotu_tree.render(output_fp, tree_style=ts)
 # read in otu table for annotating tips with abundance info
 
 # annote symbiont tree by host 
@@ -176,12 +215,17 @@ def main():
     collapse_field = args.collapse_field
     results_table_fp = args.results_table_fp
     host_tree_fp = args.host_tree_fp
+    potu_table_fp = args.potu_table_fp
     subcluster_dir = args.subcluster_dir
     output_dir = args.output_dir
     pies = args.pies
     labels = args.labels
     output_format = args.output_format
     force = args.force
+
+    if potu_table_fp is not None:
+        taxonomy = True
+        potu_table = load_table(potu_table_fp)
 
     results_table = read_cosp_nodes_table(results_table_fp)
 
@@ -196,6 +240,14 @@ def main():
             raise OSError("Output directory already exists. Please choose "
                 "a different directory, or force overwrite with -f.")
 
+    host_tree_output_fp = os.path.join(output_dir,'{0}.{1}'.format(
+                    os.path.splitext(
+                                     os.path.basename(host_tree_fp)
+                                    )[0],
+                    output_format))
+
+    print_colored_host_tree(host_tree_fp, host_colors, host_tree_output_fp)
+
     if collapse_field:
         cotu_biom_filename = 'otu_table_%s.biom' % collapse_field
     else:
@@ -204,7 +256,7 @@ def main():
     for potu in results_table.iterrows():
         cotu_tree = Tree(remove_newick_node_labels(potu[1].s_nodes))
 
-        cotu_table = parse_table(open(os.path.join(subcluster_dir, str(potu[1].pOTU), cotu_biom_filename)))
+        cotu_table = load_table(os.path.join(subcluster_dir, str(potu[1].pOTU), cotu_biom_filename))
 
         print 'Adding hosts to pOTU %s' % potu[1].pOTU
 
@@ -214,9 +266,16 @@ def main():
         if labels:
             add_colored_host_label(cotu_tree, cotu_table, host_colors)
 
+        ts = TreeStyle()
+
+        if taxonomy:
+            tax = potu_table.metadata(id=str(potu[1].pOTU), axis='observation')['taxonomy']
+            tax_string = '\n'.join(tax)
+            ts.legend.add_face(TextFace(tax_string), column=0)
+
         output_fp = os.path.join(output_dir,'{0}.{1}'.format(str(potu[1].pOTU),output_format))
 
-        render_cotu_tree(cotu_tree, output_fp)
+        render_cotu_tree(cotu_tree, output_fp, ts)
 
 
 if __name__ == "__main__":
