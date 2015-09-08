@@ -203,7 +203,7 @@ def render_tree(sk_tree, tip_hues, tip_lums, saturation=0.9, output_fp=None, sup
 
 def layout(node):
     if node.is_leaf():
-        # Add node name to laef nodes
+        # Add node name to leaf nodes
         N = AttrFace("name", fsize=14, fgcolor=node.tip_color)
         faces.add_face_to_node(N, node, 0)
 
