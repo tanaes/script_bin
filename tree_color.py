@@ -176,7 +176,8 @@ def render_tree(sk_tree, tip_hues, tip_lums, saturation=0.9, output_fp=None, sup
         if (ete_leaf.name not in tree_tips) and (ete_leaf.name[1:-1] in tree_tips):
             ete_leaf.name = ete_leaf.name[1:-1]
         elif ete_leaf.name not in tree_tips:
-            raise 'leaf {0} in ete-parsed tree not found in skbio tree {1}'.format(ete_leaf.name,str(tree))
+            print 'leaf {0} in ete-parsed tree not found in skbio tree {1}'.format(ete_leaf.name,str(sk_tree.ascii_art()))
+            raise KeyError
 
     for n in ete_tree.traverse():
         if n.is_leaf():
@@ -223,7 +224,7 @@ def main():
     lum_sep = args.lum_sep
     supress_display = args.supress_display
 
-    sk_tree = TreeNode.read(tree_fp)
+    sk_tree = TreeNode.read(tree_fp, convert_underscores=False)
 
     tip_hues = get_tip_hues(sk_tree, hue_start=hue_start, hue_end=hue_end)
 
