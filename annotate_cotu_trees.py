@@ -38,9 +38,9 @@ parser.add_argument('-o', '--output_dir',
     type=str,
     help='path to output directory for writing tree images')
 
-parser.add_argument('--potu_table_fp', 
-    type=str,
-    help='path to pOTU table for adding taxonomy information to cOTU trees')
+parser.add_argument('--taxonomy', 
+    action='store_true',
+    help='add taxonomy information from results table to output tree')
 
 parser.add_argument('-f', '--output_format', 
     choices=['pdf', 'png', 'svg'],
@@ -129,14 +129,14 @@ def add_host_pies(cotu_tree, cotu_table, host_colors, count = True, max_pie=100)
         
         pie_colors = [host_colors[host] for host in cotu_table.ids(axis='sample')] 
 
-        print cotu_table
-        print tip.name
+        #print cotu_table
+        #print tip.name
 
         thing = cotu_table.filter(lambda val, id_, md: id_ == tip.name, 
                                    axis='observation',
                                    inplace=False)
 
-        print thing
+        #print thing
 
         size = (((thing.sum(axis='observation')[0]/float(size_max))/3.14) ** (0.5)) * max_pie
 
@@ -228,19 +228,13 @@ def main():
     collapse_field = args.collapse_field
     results_table_fp = args.results_table_fp
     host_tree_fp = args.host_tree_fp
-    potu_table_fp = args.potu_table_fp
+    taxonomy = args.taxonomy
     subcluster_dir = args.subcluster_dir
     output_dir = args.output_dir
     pies = args.pies
     labels = args.labels
     output_format = args.output_format
     force = args.force
-
-    if potu_table_fp is not None:
-        taxonomy = True
-        potu_table = load_table(potu_table_fp)
-    else:
-        taxonomy = False
 
     results_table = read_cosp_nodes_table(results_table_fp)
 
@@ -268,6 +262,7 @@ def main():
     else:
         cotu_biom_filename = 'otu_table.biom'
 
+    i = 0
     for potu in results_table.iterrows():
         cotu_tree = Tree(remove_newick_node_labels(potu[1].s_nodes))
 
@@ -278,9 +273,9 @@ def main():
 
         print 'Adding hosts to pOTU %s' % potu[1].pOTU
 
-        print cotu_tree
-        print cotu_table
-        print host_colors
+        #print cotu_tree
+        #print cotu_table
+        #print host_colors
 
         if pies:
             add_host_pies(cotu_tree, cotu_table, host_colors)
@@ -291,13 +286,14 @@ def main():
         ts = TreeStyle()
 
         if taxonomy:
-            tax = potu_table.metadata(id=str(potu[1].pOTU), axis='observation')['taxonomy']
-            tax_string = '\n'.join(tax)
+            tax_string = potu[1].taxonomy
             ts.legend.add_face(TextFace(tax_string), column=0)
 
-        output_fp = os.path.join(output_dir,'{0}.{1}'.format(str(potu[1].pOTU),output_format))
+        output_fp = os.path.join(output_dir,'{0}_node{1}.{2}'.format(str(potu[1].pOTU),i,output_format))
 
         render_cotu_tree(cotu_tree, output_fp, ts)
+
+        i += 1
 
 
 if __name__ == "__main__":
