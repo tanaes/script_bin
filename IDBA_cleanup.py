@@ -5,7 +5,7 @@ import os
 import sys
 
 
-def main:
+def main():
 
     target_dir = sys.argv[1]
 
