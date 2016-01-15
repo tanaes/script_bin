@@ -162,8 +162,11 @@ def add_taxonomy_label(cotu_tree, potu_table):
             ts.legend.add_face(TextFace(labels_list[row][col], fsize=20), column=col)
 
 
-def print_colored_host_tree(host_tree_fp, host_colors, output_fp):
-    tree = Tree(host_tree_fp)
+def print_colored_host_tree(host_tree_fp, host_colors, output_fp, treefmt=5):
+    with open(host_tree_fp) as tree_f:
+        treestring = remove_newick_node_labels(tree_f.readline().strip())
+
+    tree = Tree(newick=treestring, format=treefmt)
 
     for host in host_colors:
         if tree.get_leaves_by_name(host) == []:
