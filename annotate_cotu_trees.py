@@ -279,7 +279,6 @@ def main():
         if len(missing_hosts) > 0:
             for host in missing_hosts:
                 host_colors[host] = '#AAAAAA'
-s
 
         print 'Adding hosts to pOTU %s' % potu[1].pOTU
 
