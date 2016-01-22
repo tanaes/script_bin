@@ -274,6 +274,13 @@ def main():
 
         cotu_table = load_table(os.path.join(subcluster_dir, str(potu[1].pOTU), cotu_biom_filename))
 
+        missing_hosts = set(cotu_table.ids(axis='sample')) - set(host_colors.keys())
+        
+        if len(missing_hosts) > 0:
+            for host in missing_hosts:
+                host_colors[host] = '#AAAAAA'
+s
+
         print 'Adding hosts to pOTU %s' % potu[1].pOTU
 
         #print cotu_tree
