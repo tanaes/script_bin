@@ -25,7 +25,7 @@ def main():
     print(f_ps)
 
     for f in f_ps:
-        if os.path.isfile(f) and not f is in files_to_keep:
+        if os.path.isfile(f) and not f in files_to_keep:
             print("Deleting %s" % f)
         else:
             print("Keeping %s")
