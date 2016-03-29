@@ -38,7 +38,7 @@ def clusters_from_uparse_file(uc_lines):
         
         if hit_type == 'H':
             # if target cluster not yet in dict, add the key
-            if target_cluster not in clusters.keys():
+            if target_cluster not in clusters:
                 clusters[target_cluster] = []
             # Now add the query id to the list for that cluster
             clusters[target_cluster].append(query_id)
