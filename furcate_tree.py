@@ -6,13 +6,17 @@ values in QIIME mapping file.
 Example usage:
 
 furcate_tree.py -m map.txt -t tree.tre -c 'TreeName,SampleID' -o furcated_tree.tre
+
+
+Can split multiple times by providing > 2 fields, e.g. TreeName,Level1,SampleID 
 """
 
 import argparse
 from cogent import LoadTree
 from qiime.parse import parse_mapping_file_to_dict
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description=__doc__,
+                            formatter_class=argparse.RawDescriptionHelpFormatter)
 
 parser.add_argument('-m', '--map_fp', 
     type=str,
@@ -25,15 +29,18 @@ parser.add_argument('-t', '--tree_fp',
 parser.add_argument('-c', '--categories', 
     type=str,
     help='comma delimited list of fields over which to furcate. First field '
-         'must match the tip names on the tree. (e.g. TreeName,SampleID'
-         'If only one value, will split by SampleID')
+         'must match the tip names on the tree. (e.g. TreeName,SampleID)'
+         'If only one value provided, will split by SampleID')
+parser.add_argument('-l', '--length', 
+    type=float, default=0.0,
+    help='branch length of inserted tips (default 0)')
 
 parser.add_argument('-o', '--output_fp', 
     type=str,
     help='path to output directory for writing tree images')
 
 
-def furcate_tree(tree, map_dict, fields):
+def furcate_tree(tree, map_dict, fields, length=0):
     if len(fields) == 1:
         fields.append('SampleID')
 
@@ -48,8 +55,9 @@ def furcate_tree(tree, map_dict, fields):
                 print "inserting field: " + map_dict[sample][this_field] + " in parent: " +  map_dict[sample][parent_field]
                 try:
                     tree.getNodesDict()[map_dict[sample][parent_field]].insert(0, map_dict[sample][this_field])
+                    tree.getNodesDict()[map_dict[sample][this_field]].Length = length
                 except KeyError as err:
-                    print("Could not find field {0}, value {1} in tree: {2}".format(parent_field,map_dict[sample][parent_field],err))
+                    print("Could not find field: {0}, value: {1} in tree: {2}".format(parent_field,map_dict[sample][parent_field],err))
         #if sample not in tree.getNodesDict():
         #    tree.getNodesDict()[map_dict[sample][fields[-1]]].insert(0,sample)
 
@@ -63,6 +71,7 @@ def main():
     map_fp = args.map_fp
     tree_fp = args.tree_fp
     output_fp = args.output_fp
+    length = args.length
 
     map_dict = parse_mapping_file_to_dict(map_fp)[0]
 
@@ -70,7 +79,7 @@ def main():
 
     tree = LoadTree(tree_fp)
 
-    furcated_tree = furcate_tree(tree, map_dict, fields)
+    furcated_tree = furcate_tree(tree, map_dict, fields, length=length)
 
     tree.writeToFile(output_fp)
 
