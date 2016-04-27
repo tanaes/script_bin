@@ -67,6 +67,8 @@ def filter_fastqs(f1_f, f2_f):
     j = 0
     k = 0
     for n1, s1, q1 in f1:
+        if n1[-2:] in ['/1','/2']:
+            n1 = n1[:-2]
         i += 1
         while True:
             (n2, s2, q2) = f2.next()
