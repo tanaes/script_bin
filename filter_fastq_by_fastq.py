@@ -80,7 +80,7 @@ def filter_fastqs(f1_f, f2_f):
                 return(i,j,k)
             j += 1
             if n1 == n2:
-                print('@{0}\n{1}\n+\n{2}\n'.format(n2, s2, q2))
+                print('@{0}\n{1}\n+\n{2}'.format(n2, s2, q2))
                 k += 1
                 break
 
