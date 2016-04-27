@@ -71,7 +71,13 @@ def filter_fastqs(f1_f, f2_f):
             n1 = n1[:-2]
         i += 1
         while True:
-            (n2, s2, q2) = f2.next()
+            try:
+                (n2, s2, q2) = f2.next()
+            except StopIteration:
+                for n1, s1, q1 in f1:
+                    i += 1
+                print('Hit end of file!', file=sys.stderr)
+                return(i,j,k)
             j += 1
             if n1 == n2:
                 print('@{0}\n{1}\n+\n{2}\n'.format(n2, s2, q2))
