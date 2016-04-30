@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import argparse
-from biom import parse_table
+from biom import load_table
 from h5py import File
 from biom.util import biom_open
 
@@ -17,7 +17,7 @@ def main():
     input_fp = args.input_fp
 
 
-    biom_table = parse_table(File(input_fp))
+    biom_table = load_table(input_fp)
 
     obs_ids = biom_table.ids(axis='observation')
 
