@@ -133,14 +133,16 @@ def main():
     try:
         r1_f = gzip.open(read1_fastq)
         r2_f = gzip.open(read2_fastq)
+        i = trim_cat_fastqs(r1_f, r2_f, read1_trim, read2_trim, orientation)
     except IOError:
         try:
             r1_f = open(read1_fastq)
             r2_f = open(read2_fastq)
+            i = trim_cat_fastqs(r1_f, r2_f, read1_trim, read2_trim, orientation)
         except:
             raise IOError('Could not open files')
 
-    i = trim_cat_fastqs(r1_f, r2_f, read1_trim, read2_trim, orientation)
+    
 
     print('Joined {0} records'.format(i, file=sys.stderr),file=sys.stderr)
 
