@@ -84,9 +84,6 @@ def readfq(fp): # this is a generator function
 
 
 def trim_cat_fastqs(r1_f, r2_f, r1_t, r2_t, orientation='ff'):
-    f1 = readfq(r1_f)
-    f2 = readfq(r2_f)
-
     i = 0
     for ((n1,s1,q1),(n2,s2,q2)) in izip(readfq(r1_f),readfq(r2_f)):
         i += 1
@@ -95,14 +92,14 @@ def trim_cat_fastqs(r1_f, r2_f, r1_t, r2_t, orientation='ff'):
         if n2[-2:] in ['/1','/2']:
             n2 = n2[:-2]
         if n1 != n2:
-            raise IOError("Sequences don't match! name1: {0} name2: {1}".format(n1,n2))
+            raise IOError("Sequences don't match!\nname1: {0}\nname2: {1}".format(n1,n2))
 
         if len(s1) < r1_t:
             raise IndexError("Read 1 is too short to trim: "
-                              "\n{0}\n{1}\n{2}".format(n1,s1,q1))
+                             "\n{0}\n{1}\n{2}\n{3}".format(n1,s1,q1,'='*r1_t))
         if len(s2) < r2_t:
             raise IndexError("Read 2 is too short to trim: "
-                              "\n{0}\n{1}\n{2}".format(n2,s2,q2))
+                             "\n{0}\n{1}\n{2}\n{3}".format(n2,s2,q2,'='*r2_t))
 
         s1_t = s1[:r1_t]
         q1_t = q1[:r1_t]
@@ -130,6 +127,8 @@ def main():
     read2_trim = args.read2_trim
     orientation = args.orientation
 
+    i = 0
+
     try:
         r1_f = gzip.open(read1_fastq)
         r2_f = gzip.open(read2_fastq)
@@ -139,8 +138,12 @@ def main():
             r1_f = open(read1_fastq)
             r2_f = open(read2_fastq)
             i = trim_cat_fastqs(r1_f, r2_f, read1_trim, read2_trim, orientation)
-        except:
-            raise IOError('Could not open files')
+        except IOError as e:
+            print('Could not open input files:\n%s' % e,file=sys.stderr)
+        except Exception as e:
+             print(e,file=sys.stderr)
+    except Exception as e:
+         print(e,file=sys.stderr)
 
     
 
