@@ -1,6 +1,17 @@
 #!/usr/bin/env python
 """
 Adds full taxonomy strings to Humann2 stratified table.
+
+will output a tab delimited text file with columns for each level of the 
+bacterial taxonomy, or a humann2-formatted gene table with the new taxonomy
+levels added. 
+
+Requires ete2 to be installed; first time it may download the NCBI taxonomy,
+which will take a while.
+
+usage:
+
+python humann2_full_tax.py -i $input -t out.txt -g h2gt.txt 
 """
 
 from ete2 import NCBITaxa
