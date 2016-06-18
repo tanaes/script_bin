@@ -146,27 +146,42 @@ def main():
     subclass_cat = args.subclass_cat
 
 
-    md_dict = parse_mapping_file_to_dict(metadata_fp)
+    md_dict = parse_mapping_file_to_dict(metadata_fp)[0]
 
-    out_f = open(output, 'w')
+    out_f = open(output_fp, 'w')
 
     with open(input_fp, 'r') as f:
 
         header = f.readline().strip().split("\t")
 
-        ids = header[1:]
+        h2_ids = header[1:]
 
-        class_vals = [md_dict[x][class_cat] for x in ids]
+        keep = []
+
+        for i in h2_ids:
+            if i in md_dict:
+                keep.append(ids.index(i))
+            else:
+                print('Warning: %s not in metadata map; being dropped',
+                      file=sys.stderr)
+
+        ids = [h2_ids[j] for j in keep]
+
+    h2g = read_humann2_genetable_generator(open(input_fp, 'r'))
+
+    class_vals = [md_dict[x][class_cat] for x in ids]
         out_f.write('{0}\t{1}\n'.format(class_cat,class_vals.join('\t')))
 
-        if subclass_cat:
-            subclass_vals = [md_dict[x][subclass_cat] for x in ids]
-            out_f.write('{0}\t{1}\n'.format(class_cat,class_vals.join('\t')))
+    if subclass_cat:
+        subclass_vals = [md_dict[x][subclass_cat] for x in ids]
+        out_f.write('{0}\t{1}\n'.format(class_cat,class_vals.join('\t')))
 
-        out_f.write('id\t{1}\n'.format(ids.join('\t')))
+    out_f.write('id\t{1}\n'.format(ids.join('\t')))
 
-        for line in f:
-            out_f.write(line)
+    for gene, samples, values, tax in h2g:
+
+        out_f.write('{0}\t{1}\n'.format(gene,
+                                        [values[s] for s in keep].join('\t'))
 
     out_f.close()   
 
