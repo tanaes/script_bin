@@ -175,7 +175,7 @@ def main():
 
     if subclass_cat:
         subclass_vals = [md_dict[x][subclass_cat] for x in ids]
-        out_f.write('{0}\t{1}\n'.format(class_cat,'\t'.join(subclass_vals)))
+        out_f.write('{0}\t{1}\n'.format(subclass_cat,'\t'.join(subclass_vals)))
 
     out_f.write('id\t{}\n'.format('\t'.join(ids)))
 
