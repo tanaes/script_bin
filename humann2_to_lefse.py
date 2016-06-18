@@ -164,25 +164,24 @@ def main():
             if i in md_dict:
                 keep.append(ids.index(i))
             else:
-                print('Warning: {} not in metadata map; being dropped'.format(i), file=sys.stderr)
+                print('byllshit)')
+                # print('Warning: {0} not in metadata map; being dropped'.format(i), file=sys.stderr)
 
         ids = [h2_ids[j] for j in keep]
 
     h2g = read_humann2_genetable_generator(open(input_fp, 'r'))
 
     class_vals = [md_dict[x][class_cat] for x in ids]
-        out_f.write('{0}\t{1}\n'.format(class_cat,class_vals.join('\t')))
+    out_f.write('{0}\t{1}\n'.format(class_cat, class_vals.join('\t')))
 
     if subclass_cat:
         subclass_vals = [md_dict[x][subclass_cat] for x in ids]
-        out_f.write('{0}\t{1}\n'.format(class_cat,class_vals.join('\t')))
+        out_f.write('{0}\t{1}\n'.format(class_cat,subclass_vals.join('\t')))
 
     out_f.write('id\t{1}\n'.format(ids.join('\t')))
 
     for gene, samples, values, tax in h2g:
-
-        out_f.write('{0}\t{1}\n'.format(gene,
-                                        [values[s] for s in keep].join('\t'))
+        out_f.write('{0}\t{1}\n'.format(gene, [values[s] for s in keep].join('\t')))
 
     out_f.close()   
 
