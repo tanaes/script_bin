@@ -177,10 +177,10 @@ def main():
         subclass_vals = [md_dict[x][subclass_cat] for x in ids]
         out_f.write('{0}\t{1}\n'.format(class_cat,'\t'.join(subclass_vals)))
 
-    out_f.write('id\t{1}\n'.format('\t'.join(ids)))
+    out_f.write('id\t{}\n'.format('\t'.join(ids)))
 
     for gene, samples, values, tax in h2g:
-        out_f.write('{0}\t{1}\n'.format(gene, [values[s] for s in keep].join('\t')))
+        out_f.write('{0}\t{1}\n'.format(gene, '\t'.join([values[s] for s in keep])))
 
     out_f.close()   
 
