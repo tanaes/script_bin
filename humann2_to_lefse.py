@@ -171,13 +171,13 @@ def main():
     h2g = read_humann2_genetable_generator(open(input_fp, 'r'))
 
     class_vals = [md_dict[x][class_cat] for x in ids]
-    out_f.write('{0}\t{1}\n'.format(class_cat, class_vals.join('\t')))
+    out_f.write('{0}\t{1}\n'.format(class_cat, '\t'.join(class_vals)))
 
     if subclass_cat:
         subclass_vals = [md_dict[x][subclass_cat] for x in ids]
-        out_f.write('{0}\t{1}\n'.format(class_cat,subclass_vals.join('\t')))
+        out_f.write('{0}\t{1}\n'.format(class_cat,'\t'.join(subclass_vals)))
 
-    out_f.write('id\t{1}\n'.format(ids.join('\t')))
+    out_f.write('id\t{1}\n'.format('\t'.join(ids)))
 
     for gene, samples, values, tax in h2g:
         out_f.write('{0}\t{1}\n'.format(gene, [values[s] for s in keep].join('\t')))
