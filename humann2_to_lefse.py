@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 """
 Takes a QIIME sample metadata mapping file and a Humann2 output table and makes
 a lefse-compatable file using the supplied class and subclass categories. 
