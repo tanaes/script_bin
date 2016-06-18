@@ -163,8 +163,7 @@ def main():
             if i in md_dict:
                 keep.append(ids.index(i))
             else:
-                print('Warning: %s not in metadata map; being dropped' % i,
-                      file=sys.stderr)
+                print('Warning: %s not in metadata map; being dropped' % i, file=sys.stderr)
 
         ids = [h2_ids[j] for j in keep]
 
