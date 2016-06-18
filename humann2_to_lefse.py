@@ -10,6 +10,7 @@ python humann2_to_lefse.py -i input_genetable.tsv -t output_genetable.tsv \
 """
 
 import argparse
+import sys
 
 parser = argparse.ArgumentParser(description=__doc__,
                             formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -162,7 +163,7 @@ def main():
             if i in md_dict:
                 keep.append(ids.index(i))
             else:
-                print('Warning: %s not in metadata map; being dropped',
+                print('Warning: %s not in metadata map; being dropped' % i,
                       file=sys.stderr)
 
         ids = [h2_ids[j] for j in keep]
