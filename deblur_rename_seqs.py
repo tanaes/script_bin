@@ -85,9 +85,15 @@ class TestRename(unittest.TestCase):
                              table_id = 'test renamed')
         obs1 = format_seqs_from_deblur_biom(input_biom_1, name_stub='deblur')
         obs2 = format_seqs_from_deblur_biom(input_biom_2, metadata_name='deblurred_seq')
-        exp = '>deblur0\nAAATC\n>deblur1\nCTTGG\n>deblur2\nATCCG'
-        self.assertEqual(exp,obs1)
-        self.assertEqual(exp,obs2)
+        obs3 = format_seqs_from_deblur_biom(input_biom_1)
+
+        exp1 = '>deblur0\nAAATC\n>deblur1\nCTTGG\n>deblur2\nATCCG'
+        exp2 = '>AAATC\nAAATC\n>CTTGG\nCTTGG\n>ATCCG\nATCCG'
+
+        self.assertEqual(exp1,obs1)
+        self.assertEqual(exp1,obs2)
+        self.assertEqual(exp2,obs3)
+
         self.assertRaises(TypeError, format_seqs_from_deblur_biom,
                           input_biom_1, metadata_name='deblurred_seq')
         self.assertRaises(KeyError, format_seqs_from_deblur_biom,
@@ -130,8 +136,11 @@ def rename_deblur_biom(biom, name_stub='deblur', metadata_name='deblurred_seq'):
     return(renamed_biom)
 
 
-def format_seqs_from_deblur_biom(biom, name_stub='deblur', metadata_name=None):
-    if metadata_name is not None:
+def format_seqs_from_deblur_biom(biom, name_stub=None, metadata_name=None):
+    if name_stub is None and metadata_name is None:
+        seqs = biom.ids(axis='observation')
+        seqnames = seqs
+    elif metadata_name is not None:
         try:
             observ_metadata = biom.metadata(axis='observation')
             seqs = [dict(x)[metadata_name] for x in observ_metadata]
