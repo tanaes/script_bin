@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 """
 deblur_split_biom.py 
+
+Splits a deblurred biom file that was processed using concatenated paired end
+reads into two separate fastq files. Can optionally provide per-position
+pseudo-quality scores to reflect positional error information provided by
+looking at PhiX reads.
 """
 
 from __future__ import print_function
