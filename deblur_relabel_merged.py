@@ -33,10 +33,6 @@ parser.add_argument('-f', '--merged_fastq_fp',
     type=str,
     help='path to merged fastq file (output of deblur_split_biom.py)')
 
-parser.add_argument('-t', '--test', 
-    action='store_true',
-    help='run unittest')
-
 
 def readfq(fp): # this is a generator function
     """
