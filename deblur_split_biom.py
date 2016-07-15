@@ -12,6 +12,7 @@ from __future__ import print_function
 import sys
 import os
 import argparse
+import unittest
 from biom import load_table
 
 parser = argparse.ArgumentParser(description=__doc__,
@@ -44,6 +45,19 @@ parser.add_argument('-t2', '--read2_trim',
 parser.add_argument('-o', '--orientation', 
     type=str, default='ff',
     help='path to fastq for read two (default: %(default)s)')
+
+parser.add_argument('-t', '--test', 
+    action='store_true',
+    help='run unittest')
+
+
+class TestSplit(unittest.TestCase):
+    def uncat_seqs_to_fastq(self):
+        self.assertEqual(1, 1)
+
+def run_unittests():
+    TestSplit('uncat_seqs_to_fastq').uncat_seqs_to_fastq()
+
 
 def uncat_seqs_to_fastq(in_seqs, q1_t, q2_t, r1_t, r2_t, orientation='ff'):
     """
@@ -90,6 +104,11 @@ def main():
     read1_trim = args.read1_trim
     read2_trim = args.read2_trim
     orientation = args.orientation
+    test = args.test
+    
+    if test:
+        run_unittests()
+        return(0)
 
     deblur_biom = load_table(input_biom)
 
