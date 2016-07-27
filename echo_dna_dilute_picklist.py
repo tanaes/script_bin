@@ -5,6 +5,15 @@ decho_dna_dilute_picklist.py
 Takes a csv input file with sample name and DNA concentration in separate cols
 and creates an Echo pick list to dilute the DNA to the specified concentration
 and volume. 
+
+Input csv format:
+Three columns, with a header row, in the following order:
+
+Sample,Conc,Well
+Bob,1,A1
+Alice,5,C1
+Dave,0.1,A3
+Stacey,10,C3
 """
 
 from __future__ import print_function
@@ -60,11 +69,11 @@ parser.add_argument('-t', '--test',
 
 class TestDilute(unittest.TestCase):
     def test_load_sample_concs(self):
-        input_csv = ('Sample\tConc\tWell\n'
-                     'Bob\t1.0\tA1\n'
-                     'Alice\t5\tB1\n'
-                     'Dave\t0.1\tA2\n'
-                     'Stacey\t10\tB2')
+        input_csv = ('Sample,Conc,Well\n'
+                     'Bob,1.0,A1\n'
+                     'Alice,5,B1\n'
+                     'Dave,0.1,A2\n'
+                     'Stacey,10,B2')
 
         input_f = StringIO(input_csv)
 
