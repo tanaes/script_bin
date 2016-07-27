@@ -58,6 +58,10 @@ parser.add_argument('--output_plate_format',
     type=str, default='384',
     help='plate type for output (default: %(default)s)')
 
+parser.add_argument('--input_plate_format', 
+    type=str, default='384',
+    help='plate type for input (default: %(default)s)')
+
 parser.add_argument('--col_offset', 
     type=int, default=0,
     help='offset this number of columns in dest plate (default: %(default)s)')
@@ -173,8 +177,18 @@ class TestDilute(unittest.TestCase):
 
         # 96 to 384
 
-        self.assertRaises(NotImplementedError, find_output_well, input_row, 
-                          input_col, input_fmt = '96', output_fmt = '384')
+        obs_output_row, obs_output_col = find_output_well(input_row,
+                                                          input_col,
+                                                          input_fmt='96',
+                                                          output_fmt='384',
+                                                          condensed_output=False,
+                                                          output_quadrant='NW')
+
+        exp_output_row = 'E'
+        exp_output_col = 5
+
+        self.assertEqual(obs_output_row, exp_output_row)
+        self.assertEqual(obs_output_col, exp_output_col)
 
         # 384 to 384, condensed, NW
 
@@ -303,15 +317,18 @@ def find_output_well(input_row,
     """
     Finds output well given input well and specified plate formats
     """
-
     input_row_ord = ord(input_row.upper()) - 65
     input_col = int(input_col)
 
-    if input_fmt is '384' and output_fmt is '96':
+    if input_fmt == '384' and output_fmt == '96':
         output_row = int(input_row_ord / 2 + 65)
         output_col = int((input_col - 1)/ 2 + 1)
 
-    elif input_fmt is '384' and output_fmt is '384':
+    elif input_fmt == '96' and output_fmt == '384':
+        output_row = int(input_row_ord * 2 + 65)
+        output_col = int((input_col - 1) * 2 + 1)
+
+    elif input_fmt == '384' and output_fmt == '384':
         if condensed_output:
             if output_quadrant is 'NW':
                 output_row = int(input_row_ord / 2 + 65)
@@ -339,7 +356,7 @@ def find_output_well(input_row,
     return(chr(output_row + row_offset), output_col + col_offset)
 
 
-def load_sample_concs(csv_f, sep='\t', header=False):
+def load_sample_concs(csv_f, sep=',', header=False):
     """
     Loads sample concentrations from CSV file
     """
@@ -396,7 +413,8 @@ def main():
     water_plate_name = args.water_plate_name
     dna_plate_name = args.dna_plate_name
     col_offset = args.col_offset
-    output_plate_format = args.output_plate_format
+    output_plate_format = str(args.output_plate_format)
+    input_plate_format = str(args.input_plate_format)
     destination_plate_name = args.destination_plate_name
     test = args.test
     
@@ -425,6 +443,11 @@ def main():
     water_str = ''
     sample_str = ''
 
+    if input_plate_format == '96':
+        print("Warning! Echo can not handle 96 well input.\n"
+              "You will need to manually fix the input well values")
+
+
     for i in range(len(samples)):
 
         sample_vol, water_vol = calc_dilution(concs[i],
@@ -435,7 +458,7 @@ def main():
 
         output_row, output_col = find_output_well(rows[i],
                                                   cols[i],
-                                                  input_fmt='384',
+                                                  input_fmt=input_plate_format,
                                                   output_fmt=output_plate_format,
                                                   col_offset = col_offset)
 
