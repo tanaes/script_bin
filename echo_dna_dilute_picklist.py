@@ -12,7 +12,6 @@ import sys
 import os
 import argparse
 import unittest
-import numpy as np
 from io import StringIO
 
 parser = argparse.ArgumentParser(description=__doc__,
