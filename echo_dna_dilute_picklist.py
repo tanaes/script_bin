@@ -483,7 +483,7 @@ def main():
 
     if out_csv is not None:
         with open(out_csv, 'w') as out_f:
-            out_f.write(header)
+            out_f.write(header + '\n')
             out_f.write(water_str + sample_str)
 
     else:
