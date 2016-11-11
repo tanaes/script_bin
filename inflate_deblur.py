@@ -11,4 +11,4 @@ sample_counts = dict(zip(deblur_biom.ids(axis='sample'),[0] * len(deblur_biom.id
 for seq,sample in deblur_biom.nonzero():
     for i in range(int(deblur_biom.get_value_by_ids(seq,sample))):
         sample_counts[sample] += 1
-        print(">{0}_{1}\n{2}\n".format(sample,sample_counts[sample],seq))
+        print(">{0}_{1}\n{2}".format(sample,sample_counts[sample],seq))
