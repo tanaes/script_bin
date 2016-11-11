@@ -4,7 +4,7 @@ from __future__ import print_function
 import sys
 from biom import parse_table
 
-deblur_biom = parse_table(open(sys.argv[1], 'r'))
+deblur_biom = load_table(sys.argv[1])
 
 sample_counts = dict(zip(deblur_biom.ids(axis='sample'),[0] * len(deblur_biom.ids(axis='sample'))))
 
