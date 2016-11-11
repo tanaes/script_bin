@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 import sys
-from biom import parse_table
+from biom import load_table
 
 deblur_biom = load_table(sys.argv[1])
 
