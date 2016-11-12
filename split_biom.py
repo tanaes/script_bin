@@ -19,7 +19,7 @@ def main():
     args = parser.parse_args()
     n = args.n
     input_fp = args.input_fp
-    outdir = args.output_dir
+    output_dir = args.output_dir
 
     biom_table = load_table(input_fp)
 
@@ -40,7 +40,7 @@ def main():
         sub_ids = obs_ids[begin_id : end_id]
 
         sub_table = biom_table.filter(lambda val, id_, md: id_ in sub_ids, axis='observation', invert=False, inplace=False)
-        with biom_open(join(out_dir,'chunk{0}.biom'.format(chunk)), 'w') as out_f:
+        with biom_open(join(output_dir,'chunk{0}.biom'.format(chunk)), 'w') as out_f:
             sub_table.to_hdf5(out_f, "split_biom.py")
 
         last_id = end_id
@@ -53,7 +53,7 @@ def main():
     sub_ids = obs_ids[last_id + 1 : ]
 
     sub_table = biom_table.filter(lambda val, id_, md: id_ in sub_ids, axis='observation', invert=False, inplace=False)
-    with biom_open(join(out_dir,'chunk{0}.biom'.format(n)), 'w') as out_f:
+    with biom_open(join(output_dir,'chunk{0}.biom'.format(n)), 'w') as out_f:
         sub_table.to_hdf5(out_f, "split_biom.py")
 
 
