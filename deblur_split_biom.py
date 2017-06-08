@@ -53,7 +53,20 @@ parser.add_argument('-t', '--test',
 
 class TestSplit(unittest.TestCase):
     def uncat_seqs_to_fastq(self):
-        self.assertEqual(1, 1)
+        in_seqs = ['AAACGTTTT',
+                   'GGGATCCCC']
+        exp_seqs = [('@AAACGTTTT\nAAAC\n+\nHHHH\n','@AAACGTTTT\nGTTTT\n+\nIIIII\n'),
+                    ('@GGGATCCCC\nGGGA\n+\nHHHH\n','@GGGATCCCC\nTCCCC\n+\nIIIII\n')]
+        q1_t = 'H'
+        q2_t = 'I'
+        r1_t = 4
+        r2_t = 5
+
+        uncat_seqs = uncat_seqs_to_fastq(in_seqs, q1_t, q2_t,
+                                         r1_t, r2_t, orientation='ff')
+
+        for obs, exp in zip(uncat_seqs, exp_seqs):
+            self.assertEqual(obs, exp)
 
 def run_unittests():
     TestSplit('uncat_seqs_to_fastq').uncat_seqs_to_fastq()
