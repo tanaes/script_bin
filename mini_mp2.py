@@ -85,7 +85,7 @@ def _seqtk_filter_markers(markers_fp, mini_markers, tmp_dir):
     return(subset_fasta_fp)
 
 
-def _bowtie2_index(subset_fasta_fp, output_dir):
+def _bowtie2_index(subset_fasta_fp, output_dir, tmp_dir):
     print('Indexing subset marker fasta')
     markers_fp = join(tmp_dir, 'markers.fasta')
     output_base = join(output_dir, os.path.split(output_dir)[1])
@@ -163,7 +163,7 @@ def reduce(clades, mp2bt2, pkl, info_fp, output_dir):
                                                 tmp_dir)
 
         # index with bowtie2
-        output_base = _bowtie2_index(subset_fasta_fp, output_dir)
+        output_base = _bowtie2_index(subset_fasta_fp, output_dir, tmp_dir)
 
         # reduce and save new pickle db
         reduce_mp2_pickle(pkl, mini_markers, output_base)
