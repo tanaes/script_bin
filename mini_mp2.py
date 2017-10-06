@@ -6,6 +6,7 @@ import pickle
 import bz2
 import tempfile
 import subprocess
+import re
 from os.path import join
 
 """
@@ -28,6 +29,7 @@ def run():
     pass
 
 def _bowtie2_markers(db_path, tmp_dir):
+    print('Making temporary fasta output of complete DB')
     markers_fp = join(tmp_dir, 'markers.fasta')
 
     with open(markers_fp, 'w') as f:
@@ -37,7 +39,7 @@ def _bowtie2_markers(db_path, tmp_dir):
     return(markers_fp)
 
 def _get_subset_markers(info_fp, clades, tmp_dir):
-
+    print('Getting the subset of markers from desired clades')
     p = re.compile('|'.join(clades))
     mini_markers = []
     with bz2.BZ2File('../metaphlan2/db_v20/mpa_v20_m200.pkl', 'r') as f:
@@ -48,6 +50,7 @@ def _get_subset_markers(info_fp, clades, tmp_dir):
     return(mini_markers)
 
 def _seqtk_filter_markers(markers_fp, mini_markers, tmp_dir):
+    print('Filtering marker fasta down to subset markers')
     # write mini markers to file
     minimarker_fp = join(tmp_dir, 'mini_markers.txt')
     with open(minimarker_fp, 'w') as f:
@@ -65,6 +68,7 @@ def _seqtk_filter_markers(markers_fp, mini_markers, tmp_dir):
 
 
 def _bowtie2_index(minimarker_fasta_fp, output_dir):
+    print('Indexing subset marker fasta')
     markers_fp = join(tmp_dir, 'markers.fasta')
     output_base = join(output_dir, os.path.split(output_dir)[1])
     proc = subprocess.Popen(['bowtie2-build', minimarker_fasta_fp, output_base],
@@ -75,6 +79,7 @@ def _bowtie2_index(minimarker_fasta_fp, output_dir):
     return(output_base)
 
 def reduce_mp2_pickle(pkl, mini_markers, output_base):
+    print('Reducing MetaPhlAn2 db pickle')
     db = pickle.load(bz2.BZ2File(pkl, 'r'))
 
     # make an initial set of the db with just the explicit markers
