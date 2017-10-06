@@ -34,17 +34,32 @@ def _bowtie2_markers(db_path, tmp_dir):
 
     with open(markers_fp, 'w') as f:
         proc = subprocess.Popen(['bowtie2-inspect', db_path],
-                                stdout=f, stderr=subprocess.DEVNULL)
-        proc.wait()
+                                stdout=f, stderr=subprocess.PIPE)
+        output = proc.communicate()
+
+    if proc.returncode != 0:
+        raise OSError('Failed with message:\n%s' % output[1])
+
     return(markers_fp)
 
 def _get_subset_markers(info_fp, clades, tmp_dir):
     print('Getting the subset of markers from desired clades')
     p = re.compile('|'.join(clades))
     mini_markers = []
-    with bz2.BZ2File('../metaphlan2/db_v20/mpa_v20_m200.pkl', 'r') as f:
+    # bunzip to temp
+    tmp_info_fp = os.path.join(tmp_dir, 'markers_info.txt')
+    
+    with open(tmp_info_fp, 'w') as f:
+        proc = subprocess.Popen(['bunzip2', '-c', info_fp],
+                                stdout=f, stderr=subprocess.PIPE)
+        output = proc.communicate()
+
+    if proc.returncode != 0:
+        raise OSError('Failed with message:\n%s' % output[1])
+        
+    with open(tmp_info_fp, 'r') as f:
         for line in f:
-            if p.match(line):
+            if p.search(line):
                 mini_markers.append(line.split('\t')[0])
 
     return(mini_markers)
@@ -56,25 +71,31 @@ def _seqtk_filter_markers(markers_fp, mini_markers, tmp_dir):
     with open(minimarker_fp, 'w') as f:
         f.write('\n'.join(mini_markers))
 
-    minimarker_fasta_fp = join(tmp_dir, 'mini_markers.fasta')
+    subset_fasta_fp = join(tmp_dir, 'mini_markers.fasta')
 
      # filter w seqtk   
-    with open(minimarker_fasta_fp, 'w') as f:
+    with open(subset_fasta_fp, 'w') as f:
         proc = subprocess.Popen(['seqtk', 'subseq', markers_fp, minimarker_fp],
-                                stdout=f, stderr=subprocess.DEVNULL)
-        proc.wait()
+                                stdout=f, stderr=subprocess.PIPE)
+        output = proc.communicate()
 
-    return(minimarker_fasta_fp)
+    if proc.returncode != 0:
+        raise OSError('Failed with message:\n%s' % output[1])
+
+    return(subset_fasta_fp)
 
 
-def _bowtie2_index(minimarker_fasta_fp, output_dir):
+def _bowtie2_index(subset_fasta_fp, output_dir):
     print('Indexing subset marker fasta')
     markers_fp = join(tmp_dir, 'markers.fasta')
     output_base = join(output_dir, os.path.split(output_dir)[1])
-    proc = subprocess.Popen(['bowtie2-build', minimarker_fasta_fp, output_base],
-                            stdout=subprocess.DEVNULL,
-                            stderr=subprocess.DEVNULL)
-    proc.wait()
+    proc = subprocess.Popen(['bowtie2-build', subset_fasta_fp, output_base],
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+    output = proc.communicate()
+
+    if proc.returncode != 0:
+        raise OSError('Failed with message:\n%s' % output[1])
 
     return(output_base)
 
@@ -142,7 +163,7 @@ def reduce(clades, mp2bt2, pkl, info_fp, output_dir):
                                                 tmp_dir)
 
         # index with bowtie2
-        output_base = _bowtie2_index(minimarker_fasta_fp, output_dir)
+        output_base = _bowtie2_index(subset_fasta_fp, output_dir)
 
         # reduce and save new pickle db
         reduce_mp2_pickle(pkl, mini_markers, output_base)
