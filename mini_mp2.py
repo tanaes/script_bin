@@ -66,7 +66,7 @@ def _bowtie2_index(minimarker_fasta_fp, output_dir):
     markers_fp = join(tmp_dir, 'markers.fasta')
     output_base = join(output_dir, os.path.split(output_dir)[1])
     proc = subprocess.Popen(['bowtie2-build', minimarker_fasta_fp, output_base],
-                            stdout=stderr=subprocess.DEVNULL,
+                            stdout=subprocess.DEVNULL,
                             stderr=subprocess.DEVNULL)
     proc.wait()
 
