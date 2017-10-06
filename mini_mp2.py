@@ -5,6 +5,7 @@ import os
 import pickle
 import bz2
 import tempfile
+from os.path import join
 
 """
 This will subset the MetaPhlan2 database to only include a subset
@@ -118,8 +119,9 @@ def reduce_mp2_pickle(pkl, mini_markers, output_base):
 def reduce(clades, mp2bt2, pkl, info_fp, output_dir):
     import snakemake
     from skbio.io.registry import sniff
-
-    os.makedirs(output_dir)
+    
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     with tempfile.TemporaryDirectory(dir='./') as tmp_dir:
         # make markers output
