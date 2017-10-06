@@ -4,7 +4,7 @@ import click
 import os
 import pickle
 import bz2
-
+import tempfile
 
 """
 This will subset the MetaPhlan2 database to only include a subset
