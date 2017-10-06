@@ -87,8 +87,8 @@ def reduce_mp2_pickle(pkl, mini_markers, output_base):
     # now iterate through the original db and make sure we have all keys
     # associated with each of these clades
     for x in db['markers']:
-    if db['markers'][x]['clade'] in clades:
-        newdb['markers'][x] = db['markers'][x]
+        if db['markers'][x]['clade'] in clades:
+            newdb['markers'][x] = db['markers'][x]
 
     # whole taxonomy is small so add full thing for good measure
     newdb['taxonomy'] = db['taxonomy']
