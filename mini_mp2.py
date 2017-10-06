@@ -17,11 +17,10 @@ Requires seqtk and bowtie2 executables in $PATH
 
 Example usage:
 ==============
-
-Execute Workflow:
------------------
-oecophylla workflow --input-dir ./inputs --sample-sheet sample.txt --params params.yaml --output-dir ./outputs
-
+mini_mp2.py reduce -b ~/ref_data/metaphlan2/db_v20/mpa_v20_m200 \ 
+-p ~/ref_data/metaphlan2/db_v20/mpa_v20_m200.pkl \
+-i ~/ref_data/metaphlan2/utils/markers_info.txt.bz2 \
+-o test_mini s__Escherichia_coli
 """
 
 @click.group()
