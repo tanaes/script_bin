@@ -5,6 +5,7 @@ import os
 import pickle
 import bz2
 import tempfile
+import subprocess
 from os.path import join
 
 """
