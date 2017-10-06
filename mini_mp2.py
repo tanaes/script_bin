@@ -29,7 +29,7 @@ def run():
 def _bowtie2_markers(db_path, tmp_dir):
     markers_fp = join(tmp_dir, 'markers.fasta')
 
-    with open(FILE, 'w+') as f:
+    with open(markers_fp, 'w') as f:
         proc = subprocess.Popen(['bowtie2-inspect', db_path],
                                 stdout=f, stderr=subprocess.DEVNULL)
         proc.wait()
