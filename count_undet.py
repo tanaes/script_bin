@@ -34,9 +34,11 @@ def main():
 
     d = {}
 
+    counter = 0
     regex = r'\:([AGCTN]+)\+([AGCTN]+)$'
     with gzip.open(fp, 'rt') as f:
         for line in f:
+            counter += 1
             m = re.search(regex, line)
 
             # print(line)
@@ -46,6 +48,9 @@ def main():
                     d[pair] = 1
                 else:
                     d[pair] += 1
+
+            if counter % 1000000 == 0:
+                print("parsed %s records" % counter)
 
     i5_seq, i7_seq, counts = [], [], []
 
