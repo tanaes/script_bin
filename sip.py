@@ -43,7 +43,7 @@ def main():
     with gzip.open(fp, 'rb') as f:
         for n,s,q in readfq(f):
             if n.endswith(barcode):
-                print('{n}\n{s}\n+{q}\n'.format(n=n, s=s, q=q))
+                print('{n}\n{s}\n+\n{q}\n'.format(n=n, s=s, q=q))
 
 if __name__ == "__main__":
     main()
