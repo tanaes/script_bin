@@ -13,7 +13,7 @@ def readfq(fp):  # this is a generator function
                     break
         if not last:
             break
-        name, seqs, last = last[1:].partition(" ")[0], [], None
+        name, seqs, last = last[1:], [], None
         for l in fp:  # read the sequence
             if l[0] in '@+>':
                 last = l[:-1]
