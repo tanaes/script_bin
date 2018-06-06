@@ -36,7 +36,7 @@ def readfq(fp):  # this is a generator function
                 yield name, seq, None  # yield a fasta record instead
                 break
 
-def main:
+def main():
     barcode = sys.argv[1]
     fp = sys.argv[2]
 
