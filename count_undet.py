@@ -32,6 +32,11 @@ def barcode_heatmap(combos):
 def main():
     fp = sys.argv[1]
 
+    if len(sys.argv) > 2:
+        until = sys.argv[2]
+    else:
+        until = 40000000
+
     d = {}
 
     counter = 0
@@ -50,7 +55,10 @@ def main():
                     d[pair] += 1
 
             if counter % 1000000 == 0:
-                print("parsed %s records" % counter)
+                print("parsed %s lines" % counter)
+
+            if counter >= until:
+                break
 
     i5_seq, i7_seq, counts = [], [], []
 
