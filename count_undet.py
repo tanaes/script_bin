@@ -71,6 +71,8 @@ def main():
                            'i7_seq': i7_seq,
                            'NumberReads': counts})
 
+    combos = combos.sort_values('NumberReads', ascending=False).head(1000)
+
     print('Top 10 i7 sequences:\n\n%s' % combos.groupby('i7_seq').sum().sort_values('NumberReads',
                                                                                   ascending=False).head(10))
     print('Top 10 i5 sequences:\n\n%s' % combos.groupby('i5_seq').sum().sort_values('NumberReads',
